@@ -40,7 +40,7 @@ func Init(opts Options) error {
 			return err
 		}
 
-		srvOpts.Sender = newSender(producer)
+		srvOpts.Sender = newSender(producer, opts.Server.WithWait)
 	}
 
 	logsrv = logger.New(srvOpts)

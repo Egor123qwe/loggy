@@ -16,7 +16,8 @@ func init() {
 		ToStderr: true,
 
 		Server: &logger.Server{
-			URLs: []string{"http://127.0.0.1:8080"},
+			URLs:     []string{"localhost:19092"},
+			WithWait: true,
 
 			Credentials: nil,
 		},

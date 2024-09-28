@@ -19,7 +19,8 @@ type Options struct {
 }
 
 type Server struct {
-	URLs []string
+	URLs     []string
+	WithWait bool // log func will wait for producer send log
 
 	// Credentials are optional
 	Credentials *Credentials
