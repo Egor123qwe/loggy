@@ -24,5 +24,8 @@ func Close() error {
 		return model.NotInitializedErr
 	}
 
-	return logsrv.Close()
+	err := logsrv.Close()
+	logsrv = nil
+
+	return err
 }

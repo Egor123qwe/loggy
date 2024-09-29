@@ -84,6 +84,7 @@ func (s *service) Close() error {
 	}
 
 	s.writers = nil
+	logging.Reset()
 
 	return err
 }

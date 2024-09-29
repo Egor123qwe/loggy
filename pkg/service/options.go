@@ -33,8 +33,8 @@ type Options struct {
 }
 
 type Server struct {
-	URL  string
-	URLs []string
+	URL              string
+	LogsChannelsURLs []string
 
 	Credentials *Credentials
 }

@@ -16,8 +16,11 @@ func init() {
 
 		Server: []logger.Server{
 			{
-				URL:  "http://localhost:8082",
-				URLs: []string{"localhost:19092"},
+				// base api url
+				URL: "http://localhost:8082",
+
+				// logs chanel urls (broker hosts)
+				LogsChannelsURLs: []string{"localhost:19092"},
 
 				Credentials: &logger.Credentials{Username: "admin", Password: "admin"},
 			},

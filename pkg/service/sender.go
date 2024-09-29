@@ -19,6 +19,9 @@ const (
 type sender struct {
 	producer producer.Producer
 	meta     meta
+
+	closer context.CancelFunc
+	logCh  chan []byte
 }
 
 type meta struct {
@@ -26,15 +29,22 @@ type meta struct {
 }
 
 func newSender(producer producer.Producer, meta meta) logger.Sender {
-	s := sender{
+	s := &sender{
 		producer: producer,
 		meta:     meta,
+
+		logCh: make(chan []byte, 1024),
 	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	s.closer = cancel
+
+	go s.serveLogs(ctx)
 
 	return s
 }
 
-func (w sender) Send(log log.Log) error {
+func (w *sender) Send(log log.Log) error {
 	m := msg.MSG{
 		Type: string(event.AddLogs),
 		Content: []msg.Log{{
@@ -52,22 +62,34 @@ func (w sender) Send(log log.Log) error {
 		return err
 	}
 
-	errCh := make(chan error, 1)
-
-	go func() {
-		ctx, cancel := context.WithTimeout(context.Background(), produceTimeout)
-		defer cancel()
-
-		errCh <- w.producer.Produce(ctx, result)
-	}()
-
-	if true {
-		return <-errCh
-	}
+	w.logCh <- result
 
 	return nil
 }
 
-func (w sender) Close() error {
+func (w *sender) serveLogs(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+
+		case b := <-w.logCh:
+			produceCtx, _ := context.WithTimeout(context.Background(), produceTimeout)
+
+			w.producer.Produce(produceCtx, b)
+		}
+	}
+}
+
+func (w *sender) Close() error {
+	w.closer()
+	close(w.logCh)
+
+	for log := range w.logCh {
+		produceCtx, _ := context.WithTimeout(context.Background(), produceTimeout)
+
+		w.producer.Produce(produceCtx, log)
+	}
+
 	return w.producer.Close()
 }

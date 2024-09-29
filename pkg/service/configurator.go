@@ -27,7 +27,7 @@ func Init(opts Options) error {
 		if err != nil {
 			return err
 		}
-		
+
 		srvOpts.Sender = append(srvOpts.Sender, sender)
 	}
 
@@ -69,7 +69,7 @@ func initServer(s Server, module string) (logger.Sender, error) {
 	// TODO
 	producerCredentials = nil
 
-	producer, err := producer.New(producerCredentials, s.URLs)
+	producer, err := producer.New(producerCredentials, s.LogsChannelsURLs)
 	if err != nil {
 		return nil, err
 	}
