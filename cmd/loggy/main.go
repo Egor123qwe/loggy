@@ -3,29 +3,33 @@ package main
 import (
 	"log"
 
-	loggerModel "github.com/Egor123qwe/loggy/pkg/model/log"
+	"github.com/Egor123qwe/loggy/pkg/model/level"
 	logger "github.com/Egor123qwe/loggy/pkg/service"
 	"github.com/google/uuid"
 )
 
 func init() {
 	logOpts := logger.Options{
-		Level:  loggerModel.DEBUG,
+		Level:  level.DEBUG,
 		Module: "loggy",
 
 		ToStderr: true,
 
-		Server: &logger.Server{
-			URLs:     []string{"localhost:19092"},
-			WithWait: true,
+		Server: []logger.Server{
+			{
+				URL:  "http://localhost:8082",
+				URLs: []string{"localhost:19092"},
 
-			Credentials: nil,
+				Credentials: &logger.Credentials{Username: "admin", Password: "admin"},
+			},
 		},
 
-		File: &logger.File{
-			Name:      "test.log",
-			MaxSizeMb: 100,
-			MaxFiles:  10,
+		File: []logger.File{
+			{
+				Name:      "test.log",
+				MaxSizeMb: 100,
+				MaxFiles:  10,
+			},
 		},
 	}
 
@@ -35,6 +39,8 @@ func init() {
 }
 
 func main() {
+	defer logger.Close()
+	
 	traceID := uuid.New().String()
 
 	log := logger.Log(traceID)

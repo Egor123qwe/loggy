@@ -18,14 +18,17 @@ const (
 
 type sender struct {
 	producer producer.Producer
-
-	safe bool
+	meta     meta
 }
 
-func newSender(producer producer.Producer, safe bool) logger.Sender {
+type meta struct {
+	module int64
+}
+
+func newSender(producer producer.Producer, meta meta) logger.Sender {
 	s := sender{
 		producer: producer,
-		safe:     safe,
+		meta:     meta,
 	}
 
 	return s
@@ -35,12 +38,12 @@ func (w sender) Send(log log.Log) error {
 	m := msg.MSG{
 		Type: string(event.AddLogs),
 		Content: []msg.Log{{
-			ID:      log.ID,
-			TraceID: log.TraceID,
-			Time:    log.Time,
-			Module:  log.Module,
-			Level:   log.Level.String(),
-			Message: log.Message,
+			ID:       log.ID,
+			TraceID:  log.TraceID,
+			Time:     log.Time,
+			ModuleID: w.meta.module,
+			Level:    log.Level.String(),
+			Message:  log.Message,
 		}},
 	}
 
@@ -58,7 +61,7 @@ func (w sender) Send(log log.Log) error {
 		errCh <- w.producer.Produce(ctx, result)
 	}()
 
-	if w.safe {
+	if true {
 		return <-errCh
 	}
 

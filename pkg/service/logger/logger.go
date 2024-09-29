@@ -11,7 +11,7 @@ import (
 const formatString = "%{time:2006-01-02 15:04:05.000}: (%{level}) traceID: %{module}: %{message}"
 
 type Service interface {
-	Get(traceID string) *logging.Logger
+	New(traceID string) *logging.Logger
 }
 
 type service struct{}
@@ -19,27 +19,30 @@ type service struct{}
 func New(opts Options) Service {
 	srv := &service{}
 
-	level := parseLevel(opts.Level)
+	level := logging.Level(opts.Level)
 	format := logging.MustStringFormatter(formatString)
 
 	backends := make([]logging.Backend, 0)
 
-	if opts.Sender != nil {
-		writer := srv.newWriter(opts.Sender, Meta{Module: opts.Module})
+	// set senders
+	for _, sender := range opts.Sender {
+		writer := srv.newWriter(sender)
 
 		backends = append(backends, add(writer, level, format))
 	}
 
-	if opts.File != nil {
+	// set files
+	for _, f := range opts.File {
 		file := &lumberjack.Logger{
-			Filename:   opts.File.Name,
-			MaxSize:    opts.File.MaxSizeMb,
-			MaxBackups: opts.File.MaxFiles,
+			Filename:   f.Name,
+			MaxSize:    f.MaxSizeMb,
+			MaxBackups: f.MaxFiles,
 		}
 
 		backends = append(backends, add(file, level, format))
 	}
 
+	// set console
 	if opts.ToStderr {
 		backends = append(backends, add(os.Stderr, level, format))
 	}
@@ -51,7 +54,6 @@ func New(opts Options) Service {
 
 func add(out io.Writer, level logging.Level, format logging.Formatter) logging.Backend {
 	backend := logging.NewLogBackend(out, "", 0)
-
 	formatter := logging.NewBackendFormatter(backend, format)
 
 	leveled := logging.AddModuleLevel(formatter)
@@ -60,6 +62,6 @@ func add(out io.Writer, level logging.Level, format logging.Formatter) logging.B
 	return leveled
 }
 
-func (s service) Get(traceID string) *logging.Logger {
+func (s service) New(traceID string) *logging.Logger {
 	return logging.MustGetLogger(traceID)
 }

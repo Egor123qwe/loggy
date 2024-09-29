@@ -6,18 +6,11 @@ import (
 
 type writer struct {
 	sender Sender
-
-	meta Meta
 }
 
-type Meta struct {
-	Module string
-}
-
-func (s service) newWriter(sender Sender, meta Meta) io.Writer {
+func (s service) newWriter(sender Sender) io.Writer {
 	w := writer{
 		sender: sender,
-		meta:   meta,
 	}
 
 	return w
@@ -28,9 +21,6 @@ func (w writer) Write(p []byte) (n int, err error) {
 	if err != nil {
 		return 0, err
 	}
-
-	// set some meta data
-	log.Module = w.meta.Module
 
 	if err := w.sender.Send(log); err != nil {
 		return 0, err

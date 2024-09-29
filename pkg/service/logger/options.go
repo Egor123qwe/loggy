@@ -1,25 +1,25 @@
 package logger
 
 import (
-	model "github.com/Egor123qwe/loggy/pkg/model/log"
+	"github.com/Egor123qwe/loggy/pkg/model/level"
+	"github.com/Egor123qwe/loggy/pkg/model/log"
 )
 
 type Options struct {
-	Level  model.Level
-	Module string
+	Level level.Level
 
 	// Writer logger options
-	Sender Sender // used only if Writer is not nil
+	Sender []Sender // used only if Writer is not nil
 
 	// file logger options
-	File *File // used only if File is not nil
+	File []File // used only if File is not nil
 
 	// other options
 	ToStderr bool
 }
 
 type Sender interface {
-	Send(log model.Log) error
+	Send(log log.Log) error
 }
 
 type File struct {
