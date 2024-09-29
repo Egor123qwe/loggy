@@ -27,7 +27,7 @@ func Init(opts Options) error {
 		if err != nil {
 			return err
 		}
-
+		
 		srvOpts.Sender = append(srvOpts.Sender, sender)
 	}
 
@@ -75,5 +75,4 @@ func initServer(s Server, module string) (logger.Sender, error) {
 	}
 
 	return newSender(producer, meta{module: resp.ModuleID}), nil
-
 }

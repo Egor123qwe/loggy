@@ -20,6 +20,7 @@ type Options struct {
 
 type Sender interface {
 	Send(log log.Log) error
+	Close() error
 }
 
 type File struct {

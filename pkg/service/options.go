@@ -4,8 +4,22 @@ import (
 	"github.com/Egor123qwe/loggy/pkg/model/level"
 )
 
+// Level implement Level here to more convenient use this module as a library
+type Level = level.Level
+
+const (
+	CRITICAL = level.CRITICAL
+	ERROR    = level.ERROR
+	WARNING  = level.WARNING
+	NOTICE   = level.NOTICE
+	INFO     = level.INFO
+	DEBUG    = level.DEBUG
+
+	Invalid = -1
+)
+
 type Options struct {
-	Level  level.Level
+	Level  Level
 	Module string
 
 	// Server logger options

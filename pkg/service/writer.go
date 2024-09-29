@@ -67,3 +67,7 @@ func (w sender) Send(log log.Log) error {
 
 	return nil
 }
+
+func (w sender) Close() error {
+	return w.producer.Close()
+}

@@ -12,9 +12,13 @@ const formatString = "%{time:2006-01-02 15:04:05.000}: (%{level}) traceID: %{mod
 
 type Service interface {
 	New(traceID string) *logging.Logger
+
+	Close() error
 }
 
-type service struct{}
+type service struct {
+	writers []io.WriteCloser
+}
 
 func New(opts Options) Service {
 	srv := &service{}
@@ -62,6 +66,24 @@ func add(out io.Writer, level logging.Level, format logging.Formatter) logging.B
 	return leveled
 }
 
-func (s service) New(traceID string) *logging.Logger {
+func (s *service) New(traceID string) *logging.Logger {
 	return logging.MustGetLogger(traceID)
+}
+
+func (s *service) Close() error {
+	var err error
+
+	for _, w := range s.writers {
+		if err == nil {
+			err = w.Close()
+
+			continue
+		}
+
+		w.Close()
+	}
+
+	s.writers = nil
+
+	return err
 }

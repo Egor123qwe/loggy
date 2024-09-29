@@ -6,7 +6,10 @@ import (
 	"github.com/op/go-logging"
 )
 
-var logsrv logger.Service
+// library data
+var (
+	logsrv logger.Service
+)
 
 func Log(traceID string) *logging.Logger {
 	if logsrv == nil {
@@ -17,5 +20,9 @@ func Log(traceID string) *logging.Logger {
 }
 
 func Close() error {
-	return nil
+	if logsrv == nil {
+		return model.NotInitializedErr
+	}
+
+	return logsrv.Close()
 }

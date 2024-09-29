@@ -3,14 +3,13 @@ package main
 import (
 	"log"
 
-	"github.com/Egor123qwe/loggy/pkg/model/level"
 	logger "github.com/Egor123qwe/loggy/pkg/service"
 	"github.com/google/uuid"
 )
 
 func init() {
 	logOpts := logger.Options{
-		Level:  level.DEBUG,
+		Level:  logger.DEBUG,
 		Module: "loggy",
 
 		ToStderr: true,
@@ -40,7 +39,7 @@ func init() {
 
 func main() {
 	defer logger.Close()
-	
+
 	traceID := uuid.New().String()
 
 	log := logger.Log(traceID)
