@@ -48,6 +48,6 @@ func main() {
 	log := logger.Log(traceID)
 
 	// tests
-	log.Infof("Hello, world!")
-	log.Criticalf("Hello, world!")
+	log.Infof("Всё хорошо")
+	log.Criticalf("Серверу не удалось подключиться")
 }

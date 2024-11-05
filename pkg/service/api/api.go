@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	sessionKey = "logs_viewer_session"
+	sessionKey = "logsSession"
 )
 
 type Service interface {
